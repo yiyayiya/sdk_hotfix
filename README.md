@@ -1,7 +1,7 @@
 # sdk 热更新
 
-> 在工作中有开发sdk，但是使用 sdk 的 app 开发不在我们这边，app 的版本发布也不受我们控制，每次 sdk 的 bug 修复或者优化都需要等待 app 下一个版本的发布，因此如果 sdk 可以热更新的话，bug的修复、功能优化的验证可以更快的响应。
-> 虽然sdk 热更新的实现很简单，但是知易行难，sdk 热更新这个功能一直都还没有上。这次终于把它做了。
+> 在工作中有开发sdk，但是使用 sdk 的 app 开发不在我们这边，app 的版本发布也不受我们控制，每次 sdk 的 bug 修复或者优化都需要等待 app 下一个版本的发布，因此如果 sdk 可以热更新的话，bug的修复、功能优化的验证可以更快的响应。
+> 虽然sdk 热更新的实现很简单，但是知易行难，sdk 热更新这个功能一直都还没有上。这次终于把它做了。
 
 ### 1. sdk 热更新的原理
 
@@ -10,13 +10,13 @@
 ### 2. sdk 热更新框架设计
 
 #### 2.1 项目结构
-1. sdk module ,sdk 的实现，这部分可以热修复。
+1. sdk module ,sdk 的实现，这部分可以热修复。
 2. sdk_shell, sdk 的壳，提供给app 调用的接口，这部分和app 一起编译打包不能热修复。
 3. app ，app 依赖 sdk_shell module。
 
 #### 2.2 sdk 接口设计
 
-范例中 sdk 对外部提供下面接口
+范例中 sdk 对外部提供下面接口
 
 ```java
 public interface ISdkApi {
@@ -101,7 +101,7 @@ public class SdkApiProxy implements ISdkApi {
     }
 ```
 
-3.2 通过Proxy 调用sdk 接口
+3.2 通过Proxy 调用sdk 接口
 
 ```java
 findViewById(R.id.click).setOnClickListener(new View.OnClickListener() {
@@ -120,7 +120,7 @@ findViewById(R.id.click).setOnClickListener(new View.OnClickListener() {
 
 #### 3.1 sdk 编译成 jar ,并转换为 android 可以加载的dex 格式的jar 
 
-android studio 中 Build-》Make Module sdk 即可以编译jar，然后使用下面gradle 脚本 可以将编译的 jar 复制到指定问题并重命名:
+android studio 中 Build-》Make Module sdk 即可以编译jar，然后使用下面gradle 脚本 可以将编译的 jar 复制到指定问题并重命名:
 
 ```groovy
 task deleteOldJar(type: Delete) {
@@ -136,14 +136,14 @@ task exportJar(type: Copy) {
 exportJar.dependsOn(deleteOldJar, build)
 ```  
 
-其中路径 build/intermediates/intermediate-jars/release 不同版本的com.android.tools.build:gradle 可能会不一样。
+其中路径 build/intermediates/intermediate-jars/release 不同版本的com.android.tools.build:gradle 可能会不一样。
 ##### 转换为 android 可以加载的dex 格式的jar:
-转换为dex 格式的jar 需要用到 android sdk build-tools 里面的dx工具,转换命令如下：
+转换为dex 格式的jar 需要用到 android sdk build-tools 里面的dx工具,转换命令如下：
 
 ```shell
 dx --dex --output=target.jar origin.jar
 ```
-其中target.jar 是转换后的dex 格式化jar 包，origin.jar 是需要转换的jar。
+其中target.jar 是转换后的dex 格式化jar 包，origin.jar 是需要转换的jar。
 
 #### 3.2 更新sdk
 修改 sdk SdkImpl 中showToast 的内容，编译并转换为dex 格式化的jar 后，adb push 到 /sdcard/sdk_dex.jar 进行测试，再不需要更新app，也无需重启app 的情况下，可以进行sdk 的修改更新。
